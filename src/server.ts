@@ -18,7 +18,7 @@ import { errorHandler } from './middleware/errorHandler';
 dotenv.config();
 
 const app = express();
-const PORT = process.env.PORT || 8080;
+const PORT = process.env.PORT || 5000;
 
 // Configure multer for file uploads
 const upload = multer({
@@ -26,9 +26,24 @@ const upload = multer({
     limits: { fileSize: 50 * 1024 * 1024 } // 50MB
 });
 
-// Middleware
+// Middleware - CORS configured for production
+const allowedOrigins = [
+    'https://obriy-frontend-6h3m.vercel.app',
+    'http://localhost:5173',
+    'http://localhost:3000'
+];
+
 app.use(cors({
-    origin: process.env.CORS_ORIGIN || 'http://localhost:5173',
+    origin: (origin, callback) => {
+        // Allow requests with no origin (mobile apps, Postman, etc.)
+        if (!origin) return callback(null, true);
+        if (allowedOrigins.includes(origin)) {
+            return callback(null, true);
+        }
+        return callback(null, false);
+    },
+    methods: ['GET', 'POST', 'PUT', 'DELETE', 'PATCH', 'OPTIONS'],
+    allowedHeaders: ['Content-Type', 'Authorization'],
     credentials: true
 }));
 app.use(express.json({ limit: '10mb' }));
@@ -68,6 +83,7 @@ app.get('/memory', (req, res) => {
 app.use(errorHandler);
 
 app.listen(PORT, () => {
-    console.log(`🚀 Server running on http://localhost:${PORT}`);
+    console.log(`🚀 Server running on port ${PORT}`);
     console.log(`📚 Obriy Backend with Supabase + AI`);
+    console.log(`🌍 Environment: ${process.env.NODE_ENV || 'development'}`);
 });
