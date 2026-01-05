@@ -13,12 +13,14 @@ class GeminiKeyRotator {
         const key3 = process.env.GEMINI_API_KEY_3;
         const key4 = process.env.GEMINI_API_KEY_4;
         const key5 = process.env.GEMINI_API_KEY_5;
+        const key6 = process.env.GEMINI_API_KEY_6;
 
         if (key1) this.keys.push(key1);
         if (key2) this.keys.push(key2);
         if (key3) this.keys.push(key3);
         if (key4) this.keys.push(key4);
         if (key5) this.keys.push(key5);
+        if (key6) this.keys.push(key6);
 
         if (this.keys.length === 0) {
             console.warn('⚠️  No GEMINI_API_KEY found in environment variables');
