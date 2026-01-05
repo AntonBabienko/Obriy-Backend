@@ -22,22 +22,8 @@ const loginSchema = z.object({
 router.post('/register', async (req, res) => {
     try {
         const data = registerSchema.parse(req.body);
-
-        // Temporary bypass for testing - return success without Supabase
         console.log('Registration attempt:', { email: data.email, role: data.role });
 
-        // Return mock success response
-        return res.status(201).json({
-            message: 'Реєстрація тимчасово недоступна (тестовий режим)',
-            user: {
-                id: 'test-user-id',
-                email: data.email,
-                role: data.role
-            }
-        });
-
-        // Original Supabase code (commented out for testing)
-        /*
         const { data: authData, error: authError } = await supabase.auth.admin.createUser({
             email: data.email,
             password: data.password,
@@ -45,6 +31,7 @@ router.post('/register', async (req, res) => {
         });
 
         if (authError) {
+            console.error('Auth error:', authError);
             return res.status(400).json({ message: authError.message });
         }
 
@@ -61,6 +48,7 @@ router.post('/register', async (req, res) => {
             });
 
         if (profileError) {
+            console.error('Profile error:', profileError);
             return res.status(400).json({ message: profileError.message });
         }
 
@@ -71,6 +59,7 @@ router.post('/register', async (req, res) => {
         });
 
         if (sessionError) {
+            console.error('Session error:', sessionError);
             return res.status(400).json({ message: sessionError.message });
         }
 
@@ -85,8 +74,8 @@ router.post('/register', async (req, res) => {
                 role: data.role
             }
         });
-        */
     } catch (error: any) {
+        console.error('Registration error:', error);
         res.status(400).json({ message: error.message });
     }
 });
