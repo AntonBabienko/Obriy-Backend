@@ -1,3 +1,5 @@
+import { Request } from 'express';
+
 export interface User {
     id: number;
     firstName: string;
@@ -17,6 +19,6 @@ export interface Course {
     createdAt: Date;
 }
 
-export interface AuthRequest extends Express.Request {
+export interface AuthRequest extends Request {
     user?: User;
 }
