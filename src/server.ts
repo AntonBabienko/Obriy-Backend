@@ -29,15 +29,20 @@ const upload = multer({
 // Middleware - CORS configured for production
 const allowedOrigins = [
     'https://obriy-frontend-6h3m.vercel.app',
+    'https://obriy-frontend-fab01zu76-antonbabienkos-projects.vercel.app',
     'http://localhost:5173',
     'http://localhost:3000'
 ];
+
+// Also allow all Vercel preview deployments
+const isVercelPreview = (origin: string) =>
+    origin?.includes('vercel.app') && origin?.includes('antonbabienkos-projects');
 
 app.use(cors({
     origin: (origin, callback) => {
         // Allow requests with no origin (mobile apps, Postman, etc.)
         if (!origin) return callback(null, true);
-        if (allowedOrigins.includes(origin)) {
+        if (allowedOrigins.includes(origin) || isVercelPreview(origin)) {
             return callback(null, true);
         }
         return callback(null, false);
