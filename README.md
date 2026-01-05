@@ -1,162 +1,53 @@
-# Obriy Backend API
+# Обрій - Backend
 
-Backend API для навчальної платформи «Обрій» з Supabase та AI інтеграцією.
+Бекенд частина навчальної платформи «Обрій» з AI інструментами.
 
-## Технології
-
-- **Node.js + Express** - веб-сервер
-- **TypeScript** - типізація
-- **Supabase** - база даних та автентифікація
-- **OpenAI GPT-4** - AI генерація контенту
-- **RAG (Retrieval-Augmented Generation)** - пошук по лекціях
-- **Multer** - завантаження файлів
-- **pdf-parse, mammoth** - обробка PDF та DOCX
-
-## Функціонал
-
-### Для викладачів:
-- ✅ Створення курсів та груп студентів
-- ✅ Завантаження лекцій (PDF, DOCX, TXT)
-- ✅ Створення тестів вручну або через AI
-- ✅ Перегляд статистики студентів
-- ✅ Аналіз успішності групи
-
-### Для студентів:
-- ✅ Перегляд лекцій
-- ✅ AI генерація карточок пам'яті
-- ✅ AI генерація тренувальних тестів
-- ✅ Чат з AI про лекцію (RAG)
-- ✅ Генерація mind map
-- ✅ Генерація конспектів
-- ✅ Проходження тестів
-- ✅ Перегляд своєї успішності
+## Технічний стек
+- Node.js + Express + TypeScript
+- Supabase для бази даних
+- AI: **Gemini 2.5 Flash** (1M токенів контексту)
+- Система кешування AI відповідей
 
 ## Встановлення
 
 ```bash
-cd backend
 npm install
 ```
 
-## Налаштування Supabase
+## Налаштування
 
-1. Створіть проєкт на [supabase.com](https://supabase.com)
-2. Виконайте SQL з файлу `supabase/schema.sql` в SQL Editor
-3. Створіть Storage bucket з назвою `lectures` (public)
-4. Скопіюйте URL та ключі в `.env`
-
-## Налаштування OpenAI
-
-1. Отримайте API ключ на [platform.openai.com](https://platform.openai.com)
-2. Додайте в `.env`
-
-## Конфігурація
-
-Створіть `.env`:
-
-```env
-PORT=8080
-NODE_ENV=development
-
-# Supabase
-SUPABASE_URL=https://your-project.supabase.co
-SUPABASE_ANON_KEY=your-anon-key
-SUPABASE_SERVICE_KEY=your-service-role-key
-
-# OpenAI
-OPENAI_API_KEY=sk-...
-
-# CORS
-CORS_ORIGIN=http://localhost:5173
-```
+1. Скопіюйте `.env.example` в `.env`
+2. Заповніть змінні середовища:
+   - `GEMINI_API_KEY_1`, `GEMINI_API_KEY_2`, `GEMINI_API_KEY_3` - API ключі Gemini
+   - `SUPABASE_URL`, `SUPABASE_ANON_KEY` - налаштування Supabase
 
 ## Запуск
 
-### Development
 ```bash
 npm run dev
 ```
 
-### Production
+Сервер запуститься на `http://localhost:3001`
+
+## AI Endpoints
+
+- `POST /api/ai/summary/:lectureId` - конспект
+- `POST /api/ai/generate-test/:lectureId` - тести
+- `POST /api/ai/flashcards/:lectureId` - картки
+- `POST /api/ai/mindmap/:lectureId` - ментальна карта
+- `POST /api/ai/chat/:lectureId` - Q&A чат
+- `POST /api/ai/ukrainian-educational/:lectureId` - укр. освітній контент
+
+## Структура проекту
+
+- `src/routes/` - API маршрути
+- `src/services/` - бізнес логіка
+- `src/config/` - конфігурація (Gemini, Supabase)
+- `src/middleware/` - middleware функції
+- `supabase/migrations/` - міграції бази даних
+
+## Тестування
+
 ```bash
-npm run build
-npm start
+npm test
 ```
-
-## API Endpoints
-
-### Authentication
-- `POST /auth/register` - Реєстрація
-- `POST /auth/login` - Вхід
-
-### Courses
-- `GET /api/courses` - Список курсів
-- `POST /api/courses` - Створити курс (teacher)
-
-### Lectures
-- `GET /api/lectures/course/:courseId` - Лекції курсу
-- `POST /api/lectures` - Завантажити лекцію (teacher)
-- `DELETE /api/lectures/:id` - Видалити лекцію (teacher)
-
-### Tests
-- `POST /api/tests` - Створити тест (teacher)
-- `POST /api/tests/generate` - Згенерувати тест AI (teacher)
-- `GET /api/tests/student` - Тести студента
-- `POST /api/tests/:id/start` - Почати тест
-- `POST /api/tests/:id/submit` - Здати тест
-- `GET /api/tests/:id/results/:submissionId` - Результати
-
-### AI Features
-- `POST /api/ai/flashcards/:lectureId` - Генерувати карточки
-- `GET /api/ai/flashcards/:lectureId` - Отримати карточки
-- `POST /api/ai/generate-test/:lectureId` - Тренувальний тест
-- `POST /api/ai/chat/:lectureId` - Чат з AI (RAG)
-- `POST /api/ai/mindmap/:lectureId` - Mind map
-- `POST /api/ai/summary/:lectureId` - Конспект
-
-### Groups
-- `POST /api/groups` - Створити групу (teacher)
-- `GET /api/groups` - Групи викладача
-- `POST /api/groups/:id/members` - Додати студента
-- `DELETE /api/groups/:id/members/:studentId` - Видалити студента
-
-### Statistics
-- `GET /api/stats/teacher` - Статистика викладача
-- `GET /api/stats/students/:id` - Статистика студента
-- `GET /api/stats/student/me` - Моя статистика
-- `GET /api/stats/group/:id` - Статистика групи
-
-## Структура БД
-
-```
-profiles - профілі користувачів
-groups - групи студентів
-group_members - члени груп
-courses - курси
-lectures - лекції
-lecture_embeddings - векторні embeddings для RAG
-flashcards - карточки пам'яті
-tests - тести
-questions - питання тестів
-answer_options - варіанти відповідей
-test_submissions - здачі тестів
-student_answers - відповіді студентів
-student_progress - прогрес студентів
-chat_messages - історія чату з AI
-```
-
-## Безпека
-
-- Row Level Security (RLS) увімкнено для всіх таблиць
-- JWT автентифікація через Supabase
-- Розділення ролей teacher/student
-- Файли зберігаються в Supabase Storage
-
-## TODO
-
-- [ ] Додати rate limiting
-- [ ] Кешування AI відповідей
-- [ ] Webhook для real-time оновлень
-- [ ] Експорт статистики в CSV
-- [ ] Email нотифікації
-- [ ] Підтримка більше форматів файлів
