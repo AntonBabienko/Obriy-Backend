@@ -14,7 +14,7 @@ router.get('/lecture/:lectureId', authenticate, async (req, res) => {
             .from('ai_history')
             .select('*')
             .eq('user_id', user.id)
-            .eq('lecture_id', parseInt(lectureId))
+            .eq('lecture_id', lectureId)
             .order('created_at', { ascending: false })
             .limit(50); // Limit to latest 50 entries
 
@@ -41,7 +41,7 @@ router.post('/', authenticate, async (req, res) => {
         }
 
         // Validate tool type
-        const validToolTypes = ['summary', 'quiz', 'flashcards', 'mindmap', 'chat'];
+        const validToolTypes = ['summary', 'quiz', 'flashcards', 'mindmap', 'chat', 'ukrainian-educational', 'analysis'];
         if (!validToolTypes.includes(toolType)) {
             return res.status(400).json({
                 error: `Invalid tool type. Must be one of: ${validToolTypes.join(', ')}`
@@ -53,7 +53,7 @@ router.post('/', authenticate, async (req, res) => {
             .from('ai_history')
             .insert({
                 user_id: user.id,
-                lecture_id: parseInt(lectureId),
+                lecture_id: lectureId,
                 tool_type: toolType,
                 result_data: resultData,
                 processing_time: parseInt(processingTime),
@@ -65,7 +65,7 @@ router.post('/', authenticate, async (req, res) => {
         if (error) throw error;
 
         // Cleanup old entries for this user/lecture combination
-        await cleanupOldEntries(user.id, parseInt(lectureId));
+        await cleanupOldEntries(user.id, lectureId);
 
         res.status(201).json(data);
     } catch (error) {
@@ -132,7 +132,7 @@ router.delete('/lecture/:lectureId', authenticate, async (req, res) => {
             .from('ai_history')
             .delete()
             .eq('user_id', user.id)
-            .eq('lecture_id', parseInt(lectureId));
+            .eq('lecture_id', lectureId);
 
         if (error) throw error;
 
@@ -154,7 +154,7 @@ router.get('/lecture/:lectureId/export', authenticate, async (req, res) => {
             .from('ai_history')
             .select('*')
             .eq('user_id', user.id)
-            .eq('lecture_id', parseInt(lectureId))
+            .eq('lecture_id', lectureId)
             .order('created_at', { ascending: false });
 
         if (error) throw error;
@@ -178,7 +178,7 @@ router.get('/lecture/:lectureId/export', authenticate, async (req, res) => {
 });
 
 // Helper function to cleanup old entries
-async function cleanupOldEntries(userId: string, lectureId: number) {
+async function cleanupOldEntries(userId: string, lectureId: string) {
     try {
         // Get all entries for this user/lecture, ordered by creation date
         const { data, error } = await supabase
